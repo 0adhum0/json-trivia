@@ -1,10 +1,7 @@
 <?php
 header('Content-Type: application/json');
-
-// Path to the JSON file
 $jsonFilePath = '../data/questions.json';
 
-// Read the existing questions
 if (!file_exists($jsonFilePath)) {
     echo json_encode(['status' => 'error', 'message' => 'File not found']);
     exit;
@@ -13,7 +10,6 @@ if (!file_exists($jsonFilePath)) {
 $jsonData = file_get_contents($jsonFilePath);
 $questions = json_decode($jsonData, true);
 
-// Get the new question data from the POST request
 $newQuestion = [
     'question' => $_POST['question'],
     'options' => explode(',', $_POST['options']),
@@ -21,13 +17,12 @@ $newQuestion = [
     'region' => $_POST['region']
 ];
 
-// Add the new question to the existing questions array
 $questions[] = $newQuestion;
 
-// Save the updated questions back to the JSON file
-if (file_put_contents($jsonFilePath, json_encode($questions, JSON_PRETTY_PRINT))) {
-    echo json_encode(['status' => 'success', 'message' => 'Question added successfully']);
+if (file_put_contents($jsonFilePath, json_encode($questions, JSON_PRETTY_PRINT)) === false) {
+    $error = error_get_last();
+    echo json_encode(['status' => 'error', 'message' => 'Failed to write to file: ' . $error['message']]);
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Failed to write to file']);
+    echo json_encode(['status' => 'success', 'message' => 'Question added successfully']);
 }
 ?>
