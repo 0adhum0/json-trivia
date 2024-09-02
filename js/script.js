@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const optionsElement = document.getElementById("options");
 	const resultElement = document.getElementById("result");
 	const submitButton = document.getElementById("submit-answer");
+	const nextButton = document.getElementById("next-question");
 
 	let currentQuestionId;
 
@@ -20,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
 								`<label><input type="radio" name="answer" value="${index}"> ${option}</label><br>`
 						)
 						.join("");
+					resultElement.textContent = ""; // Clear result
+					nextButton.style.display = "none"; // Hide "Next Question" button
 				} else {
 					questionElement.textContent = "Error loading question";
 				}
@@ -54,14 +57,21 @@ document.addEventListener("DOMContentLoaded", () => {
 					} else {
 						resultElement.textContent = data.message;
 					}
-					fetchQuestion(); // Fetch a new question
+					submitButton.style.display = "none"; // Hide "Submit Answer" button
+					nextButton.style.display = "inline"; // Show "Next Question" button
 				} else {
 					resultElement.textContent = "Error validating answer";
 				}
 			});
 	}
 
+	function loadNextQuestion() {
+		submitButton.style.display = "inline"; // Show "Submit Answer" button
+		fetchQuestion();
+	}
+
 	submitButton.addEventListener("click", submitAnswer);
+	nextButton.addEventListener("click", loadNextQuestion);
 
 	fetchQuestion(); // Load the first question on page load
 });

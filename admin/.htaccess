@@ -1,0 +1,5 @@
+# Password protect the admin directory
+AuthType Basic
+AuthName "Restricted Access"
+AuthUserFile /etc/apache2/.htpasswd
+Require valid-user

@@ -1,28 +1,68 @@
-<?php
-header('Content-Type: application/json');
-$jsonFilePath = '../data/questions.json';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Question</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        #admin-container {
+            width: 80%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="admin-container">
+        <h2>Add a New Question</h2>
+        <form action="add_question.php" method="post">
+            <label for="question">Question:</label>
+            <input type="text" id="question" name="question" required>
 
-if (!file_exists($jsonFilePath)) {
-    echo json_encode(['status' => 'error', 'message' => 'File not found']);
-    exit;
-}
+            <label for="options">Options (comma separated):</label>
+            <input type="text" id="options" name="options" required>
 
-$jsonData = file_get_contents($jsonFilePath);
-$questions = json_decode($jsonData, true);
+            <label for="answer">Index of Correct Answer:</label>
+            <input type="text" id="answer" name="answer" required>
 
-$newQuestion = [
-    'question' => $_POST['question'],
-    'options' => explode(',', $_POST['options']),
-    'answer' => intval($_POST['answer']),
-    'region' => $_POST['region']
-];
+            <label for="region">Region:</label>
+            <input type="text" id="region" name="region" required>
 
-$questions[] = $newQuestion;
-
-if (file_put_contents($jsonFilePath, json_encode($questions, JSON_PRETTY_PRINT)) === false) {
-    $error = error_get_last();
-    echo json_encode(['status' => 'error', 'message' => 'Failed to write to file: ' . $error['message']]);
-} else {
-    echo json_encode(['status' => 'success', 'message' => 'Question added successfully']);
-}
-?>
+            <button type="submit">Add Question</button>
+        </form>
+    </div>
+</body>
+</html>
