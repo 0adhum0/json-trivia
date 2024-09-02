@@ -1,58 +1,67 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 	const quizContainer = document.getElementById("quiz-container");
 	const questionElement = document.getElementById("question");
 	const optionsElement = document.getElementById("options");
-	const submitButton = document.getElementById("submit");
 	const resultElement = document.getElementById("result");
+	const submitButton = document.getElementById("submit-answer");
 
-	let currentQuestionIndex = 0;
-	let score = 0;
-	let questions = [];
+	let currentQuestionId;
 
-	// Fetch questions from the JSON file
-	fetch("data/questions.json")
-		.then((response) => response.json())
-		.then((data) => {
-			questions = data;
-			displayQuestion();
-		});
-
-	function displayQuestion() {
-		const question = questions[currentQuestionIndex];
-		questionElement.textContent = question.question;
-
-		optionsElement.innerHTML = "";
-		question.options.forEach((option, index) => {
-			const optionElement = document.createElement("div");
-			optionElement.innerHTML = `<input type="radio" name="option" value="${index}"> ${option}`;
-			optionsElement.appendChild(optionElement);
-		});
+	function fetchQuestion() {
+		fetch("admin/quiz.php")
+			.then((response) => response.json())
+			.then((data) => {
+				if (data.status === "success") {
+					currentQuestionId = data.id;
+					questionElement.textContent = data.question;
+					optionsElement.innerHTML = data.options
+						.map(
+							(option, index) =>
+								`<label><input type="radio" name="answer" value="${index}"> ${option}</label><br>`
+						)
+						.join("");
+				} else {
+					questionElement.textContent = "Error loading question";
+				}
+			});
 	}
 
-	submitButton.addEventListener("click", function () {
+	function submitAnswer() {
 		const selectedOption = document.querySelector(
-			'input[name="option"]:checked'
+			'input[name="answer"]:checked'
 		);
+
 		if (!selectedOption) {
-			alert("Please select an answer");
+			resultElement.textContent = "Please select an answer.";
 			return;
 		}
 
-		const answer = parseInt(selectedOption.value);
-		if (answer === questions[currentQuestionIndex].answer) {
-			score++;
-		}
+		const userAnswer = parseInt(selectedOption.value);
 
-		currentQuestionIndex++;
-		if (currentQuestionIndex < questions.length) {
-			displayQuestion();
-		} else {
-			showResult();
-		}
-	});
-
-	function showResult() {
-		resultElement.textContent = `Your score is ${score} out of ${questions.length}`;
-		quizContainer.style.display = "none";
+		fetch("admin/validate_answer.php", {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: new URLSearchParams({
+				id: currentQuestionId,
+				answer: userAnswer,
+			}),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				if (data.status === "success") {
+					if (data.isCorrect) {
+						resultElement.textContent = "Correct!";
+					} else {
+						resultElement.textContent = data.message;
+					}
+					fetchQuestion(); // Fetch a new question
+				} else {
+					resultElement.textContent = "Error validating answer";
+				}
+			});
 	}
+
+	submitButton.addEventListener("click", submitAnswer);
+
+	fetchQuestion(); // Load the first question on page load
 });

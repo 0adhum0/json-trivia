@@ -1,14 +1,14 @@
 [
 	{
 		"question": "What is the capital of France?",
-		"options": ["Berlin", "Madrid", "Paris", "Rome"],
-		"answer": 2,
+		"options": ["Paris", "London", "Berlin", "Madrid"],
+		"answer": 0, 
 		"region": "Europe"
 	},
 	{
 		"question": "Is the Earth flat?",
 		"options": ["True", "False"],
-		"answer": 1,
-		"region": "Global"
+		"answer": 1, 
+		"region": "Science"
 	}
 ]
